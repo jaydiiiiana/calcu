@@ -4,8 +4,9 @@ import { useState } from 'react';
 
 export default function Home() {
   const [display, setDisplay] = useState('0');
-  const [showPrank, setShowPrank] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  const [showPrank, setShowPrank] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   const handleNumber = (num: string) => {
     if (display === '0') {
@@ -16,6 +17,7 @@ export default function Home() {
   };
 
   const handleOperator = (op: string) => {
+    if (display.endsWith(' ')) return;
     setDisplay(prev => prev + ' ' + op + ' ');
   };
 
@@ -24,14 +26,37 @@ export default function Home() {
     setHistory([]);
   };
 
-  const triggerPrank = () => {
-    // Add current display to history to make it look like it's about to calculate
-    setHistory([display]);
-    
-    // Small delay to make it feel like "processing"
-    setTimeout(() => {
+  const handleCalculate = () => {
+    if (!isPremium) {
+      setHistory([display]);
       setShowPrank(true);
-    }, 400);
+      return;
+    }
+
+    try {
+      let expression = display
+        .replace(/÷/g, '/')
+        .replace(/×/g, '*')
+        .replace(/−/g, '-');
+
+      if (!expression || expression.endsWith(' ')) return;
+
+      // eslint-disable-next-line no-eval
+      const result = eval(expression);
+      
+      setHistory([display]);
+      setDisplay(String(result));
+    } catch (error) {
+      setDisplay('Error');
+      setTimeout(() => setDisplay('0'), 1500);
+    }
+  };
+
+  const upgradeToPremium = () => {
+    setIsPremium(true);
+    setShowPrank(false);
+    // Automatically calculate after "upgrading"
+    handleCalculate();
   };
 
   return (
@@ -39,7 +64,10 @@ export default function Home() {
       <div className="calculator-card">
         <div className="display-section">
           <div className="history">{history[history.length - 1] || ''}</div>
-          <div className="main-display">{display}</div>
+          <div className="main-display">
+            {display}
+            {isPremium && <span className="premium-badge">PREMIUM</span>}
+          </div>
         </div>
         
         <div className="keypad">
@@ -65,7 +93,7 @@ export default function Home() {
           
           <button className="btn zero" onClick={() => handleNumber('0')}>0</button>
           <button className="btn" onClick={() => handleNumber('.')}>.</button>
-          <button className="btn operator equals" onClick={triggerPrank}>=</button>
+          <button className="btn operator equals" onClick={handleCalculate}>=</button>
         </div>
       </div>
 
@@ -73,8 +101,8 @@ export default function Home() {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="crown-icon">💎</div>
-            <h2>Unlock Calculation</h2>
-            <p>You've reached the limit of free calculations. Please upgrade to our Diamond Membership to see the result of <strong>{display}</strong>.</p>
+            <h2>Premium Result Locked</h2>
+            <p>Free users are limited to viewing the expression. Upgrade to see the result of <strong>{display}</strong>.</p>
             
             <div className="pricing-tiers">
               <div className="tier">
@@ -84,7 +112,7 @@ export default function Home() {
                   <li>Basic Addition</li>
                   <li>10 calculations/day</li>
                 </ul>
-                <button className="buy-btn" onClick={() => alert('Processing... Error: Payment Gateway Timeout')}>Upgrade</button>
+                <button className="buy-btn" onClick={upgradeToPremium}>Upgrade</button>
               </div>
               <div className="tier featured">
                 <div className="badge">Best Value</div>
@@ -95,7 +123,7 @@ export default function Home() {
                   <li>Unlimited results</li>
                   <li>Priority calculation</li>
                 </ul>
-                <button className="buy-btn featured" onClick={() => alert('Processing... Error: Credit Card Declined (Prank Mode Active)')}>Get Diamond</button>
+                <button className="buy-btn featured" onClick={upgradeToPremium}>Get Diamond</button>
               </div>
             </div>
             
@@ -103,6 +131,25 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .premium-badge {
+          font-size: 10px;
+          background: linear-gradient(45deg, #ffd700, #ff8c00);
+          color: black;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 800;
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          letter-spacing: 1px;
+        }
+        
+        .display-section {
+          position: relative;
+        }
+      `}</style>
     </main>
   );
 }
