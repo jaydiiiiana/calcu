@@ -7,6 +7,7 @@ export default function Home() {
   const [history, setHistory] = useState<string[]>([]);
   const [showPrank, setShowPrank] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   const handleNumber = (num: string) => {
     if (display === '0') {
@@ -52,9 +53,14 @@ export default function Home() {
     }
   };
 
-  const upgradeToPremium = () => {
+  const handleUpgradeClick = () => {
+    setShowQR(true);
+  };
+
+  const confirmPayment = () => {
     setIsPremium(true);
     setShowPrank(false);
+    setShowQR(false);
     // Automatically calculate after "upgrading"
     handleCalculate();
   };
@@ -100,34 +106,56 @@ export default function Home() {
       {showPrank && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="crown-icon">💎</div>
-            <h2>Premium Result Locked</h2>
-            <p>Free users are limited to viewing the expression. Upgrade to see the result of <strong>{display}</strong>.</p>
-            
-            <div className="pricing-tiers">
-              <div className="tier">
-                <h3>Starter</h3>
-                <div className="price">$9.99<span>/mo</span></div>
-                <ul>
-                  <li>Basic Addition</li>
-                  <li>10 calculations/day</li>
-                </ul>
-                <button className="buy-btn" onClick={upgradeToPremium}>Upgrade</button>
+            {!showQR ? (
+              <>
+                <div className="crown-icon">💎</div>
+                <h2>Premium Result Locked</h2>
+                <p>Free users are limited to viewing the expression. Upgrade to see the result of <strong>{display}</strong>.</p>
+                
+                <div className="pricing-tiers">
+                  <div className="tier">
+                    <h3>Basic</h3>
+                    <div className="price">$9.99<span>/mo</span></div>
+                    <ul>
+                      <li>Basic Addition</li>
+                      <li>10 calculations/day</li>
+                    </ul>
+                    <button className="buy-btn" onClick={handleUpgradeClick}>Upgrade</button>
+                  </div>
+                  <div className="tier featured">
+                    <div className="badge">Recommended</div>
+                    <h3>Premium</h3>
+                    <div className="price">$49.99<span>/mo</span></div>
+                    <ul>
+                      <li>All Operators unlocked</li>
+                      <li>Unlimited results</li>
+                      <li>Priority calculation</li>
+                    </ul>
+                    <button className="buy-btn featured" onClick={handleUpgradeClick}>Get Premium</button>
+                  </div>
+                </div>
+                
+                <button className="close-btn" onClick={() => setShowPrank(false)}>Maybe later</button>
+              </>
+            ) : (
+              <div className="gcash-section">
+                <div className="gcash-logo">GCash</div>
+                <h3>Scan to Pay</h3>
+                <p>Pay <strong>₱2,500.00</strong> to unlock Premium features.</p>
+                
+                <div className="qr-container">
+                  <div className="fake-qr">
+                    <div className="qr-pattern"></div>
+                    <div className="qr-center-logo">G</div>
+                  </div>
+                </div>
+                
+                <p className="hint">Scanning this QR code will instantly verify your payment.</p>
+                
+                <button className="buy-btn featured" onClick={confirmPayment}>I have paid</button>
+                <button className="close-btn" onClick={() => setShowQR(false)}>Go back</button>
               </div>
-              <div className="tier featured">
-                <div className="badge">Best Value</div>
-                <h3>Diamond</h3>
-                <div className="price">$49.99<span>/mo</span></div>
-                <ul>
-                  <li>All Operators unlocked</li>
-                  <li>Unlimited results</li>
-                  <li>Priority calculation</li>
-                </ul>
-                <button className="buy-btn featured" onClick={upgradeToPremium}>Get Diamond</button>
-              </div>
-            </div>
-            
-            <button className="close-btn" onClick={() => setShowPrank(false)}>Maybe later</button>
+            )}
           </div>
         </div>
       )}
@@ -148,6 +176,78 @@ export default function Home() {
         
         .display-section {
           position: relative;
+        }
+
+        .gcash-section {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .gcash-logo {
+          background: #0055ff;
+          color: white;
+          padding: 4px 12px;
+          border-radius: 8px;
+          font-weight: 900;
+          display: inline-block;
+          margin-bottom: 20px;
+          font-style: italic;
+        }
+
+        .qr-container {
+          background: white;
+          padding: 20px;
+          border-radius: 16px;
+          display: inline-block;
+          margin: 20px 0;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .fake-qr {
+          width: 180px;
+          height: 180px;
+          background: #eee;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid #0055ff;
+        }
+
+        .qr-pattern {
+          width: 100%;
+          height: 100%;
+          background-image: 
+            radial-gradient(#333 20%, transparent 20%),
+            radial-gradient(#333 20%, transparent 20%);
+          background-position: 0 0, 10px 10px;
+          background-size: 20px 20px;
+          opacity: 0.8;
+        }
+
+        .qr-center-logo {
+          position: absolute;
+          background: #0055ff;
+          color: white;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          border-radius: 8px;
+          font-size: 24px;
+        }
+
+        .hint {
+          font-size: 12px;
+          color: #64748b;
+          margin-top: 10px;
+          font-style: italic;
         }
       `}</style>
     </main>
