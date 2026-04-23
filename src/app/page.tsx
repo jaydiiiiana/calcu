@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function Home() {
   const [display, setDisplay] = useState('0');
@@ -144,9 +145,12 @@ export default function Home() {
                 <p>Pay <strong>₱2,500.00</strong> to unlock Premium features.</p>
                 
                 <div className="qr-container">
-                  <div className="fake-qr">
-                    <div className="qr-pattern"></div>
-                    <div className="qr-center-logo">G</div>
+                  <div className="qr-image-wrapper">
+                    <img 
+                      src="/673827039_939065798935654_9043549755425352235_n.jpg" 
+                      alt="GCash QR Code" 
+                      className="user-qr-image"
+                    />
                   </div>
                 </div>
                 
@@ -200,47 +204,28 @@ export default function Home() {
 
         .qr-container {
           background: white;
-          padding: 20px;
+          padding: 15px;
           border-radius: 16px;
           display: inline-block;
           margin: 20px 0;
           box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .fake-qr {
-          width: 180px;
-          height: 180px;
-          background: #eee;
-          position: relative;
+        .qr-image-wrapper {
+          width: 220px;
+          height: 220px;
+          overflow: hidden;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid #0055ff;
+          background: #f8fafc;
         }
 
-        .qr-pattern {
+        .user-qr-image {
           width: 100%;
           height: 100%;
-          background-image: 
-            radial-gradient(#333 20%, transparent 20%),
-            radial-gradient(#333 20%, transparent 20%);
-          background-position: 0 0, 10px 10px;
-          background-size: 20px 20px;
-          opacity: 0.8;
-        }
-
-        .qr-center-logo {
-          position: absolute;
-          background: #0055ff;
-          color: white;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 900;
-          border-radius: 8px;
-          font-size: 24px;
+          object-fit: contain;
         }
 
         .hint {
